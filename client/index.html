@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.27.6.min.js"></script>
+    <link href="https://webfonts.zoho.com/css?family=Poppins:300,400,500,600,700,800">
+
+    <style>
+        body {
+            font-family: "Poppins";
+            font-weight: 400;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        /* Create three equal columns that floats next to each other */
+        
+        .column {
+            float: left;
+            width: 33.33%;
+            padding: 0 10px;
+            background-color: aqua;
+            /* Should be removed. Only for demonstration */
+        }
+        /* Clear floats after the columns */
+        
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+        
+        #store1,
+        #store2 {
+            /* // float: left; */
+            width: 290px;
+            /* //    height: 330px;  */
+            margin: 0 auto 60px;
+            min-height: 170px;
+        }
+        
+        #store1 {
+            background: rgb(238, 198, 210);
+            border: 1px rgb(0, 0, 0, 0.8) solid !important;
+            padding: 10px 0;
+        }
+        
+        #cart1_droppable {
+            /* float: right;
+            width: 300px;
+            height: 300px; */
+            background: rgb(238, 198, 210);
+            border: 1px solid rgba(0, 0, 0, 0.6);
+            margin: 0px 30px 12px 30px;
+            padding: 20px 20px 30px 30px;
+            min-height: 260px;
+            position: relative;
+            justify-content: center;
+        }
+        
+        #cart2_droppable {
+            /* float: right;
+            width: 300px;
+            height: 300px; */
+            border-radius: 0px;
+            background: rgb(181, 226, 195);
+            border: 2px solid rgb(61, 112, 104);
+            margin: 0px 30px 12px 30px;
+            padding: 20px 20px 30px 30px;
+            min-height: 260px;
+            position: relative;
+            justify-content: center;
+        }
+        
+        #store1,
+        #store2 {
+            border: 1px rgba(0, 0, 0, 0.7) solid;
+            align-items: center;
+            padding: 2px 0 4px;
+            border-radius: 3px;
+            justify-content: center;
+        }
+        
+        #store2 {
+            background: rgb(181, 226, 195);
+            border: 2px rgb(112, 140, 121) solid !important;
+            padding: 10px 0;
+        }
+        
+        .storeImages1 {
+            border-bottom: 1px rgb(108, 191, 216) solid;
+        }
+        
+        .storeImages1:last-child,
+        .storeImages2:last-child {
+            border-bottom: none;
+        }
+        
+        #store1 {
+            margin: 0 auto 110px;
+        }
+        
+        .storeImages2,
+        .storeImages1 {
+            display: flex;
+            align-items: center;
+            padding: 4px 0px 4px 0;
+            font-style: italic;
+            justify-content: center;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #708c79;
+        }
+        
+        .storeImages1 img,
+        .storeImages2 img,
+        .storeImages1 .itemName,
+        .storeImages2 .itemName,
+        .storeImages1 .description,
+        .storeImages2 .description,
+        .storeImages2 label,
+        .storeImages1 label {
+            width: 22%;
+            padding: 0 5px;
+            text-align: center;
+        }
+        
+        .storeImages2 button,
+        .storeImages1 button {
+            width: 12%;
+        }
+        
+        .label {
+            /*border: 1px rgb(108, 191, 216) solid;
+            display: flex;
+            align-items: center;*/
+            padding: 1px 10px 1px 8px;
+        }
+        
+        .formFields {
+            /*border: 1px rgb(108, 191, 216) solid;*/
+            display: block;
+            align-items: center;
+            padding: 2px 4px 1px 8px;
+            width: 100%;
+        }
+        
+        .button {
+            background-color: rgb(35, 107, 64);
+            border: none;
+            color: white;
+            padding: 6px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 30px 16px 14px;
+            cursor: pointer;
+            font-size: 12px;
+            padding: 7px 15px;
+        }
+        
+        .button_high {
+            background: #108fe8;
+            box-shadow: 0 -2px 0 3px #0d72b8 inset, 0 5px 5px rgba(3, 25, 41, 0.17), 0 15px rgba(255, 255, 255, 0.25) inset;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        .button4 {
+            border-radius: 4px;
+            position: absolute;
+            bottom: 0;
+            right: 0;
+        }
+        
+        .fieldrow {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .fieldrow label {
+            width: 80px;
+            display: inline-block;
+            text-align: right;
+            margin-right: 10px;
+        }
+        
+        .fieldrow input {
+            border: 1px solid #e4e4e4;
+            width: 50%;
+            padding: 5px 10px;
+            border-radius: 2px;
+            outline: none;
+        }
+        
+        h2 {
+            color: #333;
+            font-size: 17px;
+            text-align: center;
+            margin: 24px 0;
+        }
+        
+        .fieldrow .txtfile {
+            border: none;
+            border: none;
+            margin-left: 70px;
+        }
+        
+        .fieldrow button {
+            margin: 10px 0;
+        }
+        
+        .container {
+            overflow: hidden;
+            display: flex;
+            justify-content: space-between;
+            align-items: stretch;
+        }
+        
+        #row1,
+        #row2 {
+            border-bottom: 1px solid #0076ac;
+        }
+        
+        h3 {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .trashicon {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 18px;
+            width: 165px;
+            height: 50px;
+            margin-right: 30px;
+        }
+        
+        .trashicon:after {
+            content: '';
+            width: 18px;
+            height: 20px;
+            background: url(trash.png) no-repeat;
+            background-size: auto;
+            background-size: 100%;
+            display: inline-block;
+            margin-left: 9px;
+        }
+        
+        .trashcontainer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .mttop {
+            margin-top: 40px;
+        }
+        /* .pad10{
+    padding-right: 10px;
+  }*/
+        
+        .storeImages2 label,
+        .storeImages1 label {}
+    </style>
+
+
+    <script type="text/javascript">
+        var genId = 0;
+        var cart1Total = 0;
+        var cart2Total = 0;
+        var names_dropped = [];
+        var pubnub = null;
+        $(document).ready(function() {
+
+            setupPubNub();
+
+            makeDragAndDroppable();
+
+            $("#addItem_Banana").click(function(event) {
+                event.preventDefault();
+                var price = $("#price").val();
+                var file = $("#file")[0].files[0];
+                var itemName_val = $("#item").val();
+                var description = $('#description').val();
+                checkInputs(price, file, itemName_val);
+
+                // alert(price);
+                // alert(file);
+                // alert(itemName_val);
+                // alert(description);
+
+                var infoArray = [];
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function() {
+                    var base64data = reader.result;
+                    // console.log('------------------- ' + base64data);
+                    //   dataURL = URL.createObjectURL(file);
+                    dataURL = base64data;
+                    infoArray.push(dataURL);
+                    infoArray.push(price);
+                    infoArray.push(itemName_val);
+                    infoArray.push(description);
+
+
+                    var publishConfig = {
+                        channel: "banana-stream",
+                        message: infoArray,
+                        error: function(error) {
+                            console.log('Error in painting ' + error);
+                        }
+                    }
+
+                    pubnub.publish(publishConfig, function(status, response) {
+                        //     console.log('publishConfig invoked' + JSON.stringify(publishConfig));
+                        //     console.log('In publish ...... ' + JSON.stringify(status) + '    response  ...' + JSON.stringify(response));
+                    });
+
+
+                }
+
+            });
+
+
+            $("#addItem_Shoes").click(function(event) {
+                event.preventDefault();
+                var price = $("#price_shoes").val();
+                var file = $("#file_shoes")[0].files[0];
+                var itemName_val = $("#item_shoes").val();
+                var description = $('#description_shoes').val();
+                // alert('shoes check');
+                checkInputs(price, file, itemName_val);
+
+                // alert(price);
+                // alert(file);
+                // alert(itemName_val);
+                // alert(description);
+
+                var infoArray = [];
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function() {
+                    var base64data = reader.result;
+                    //       console.log('-------------------   ' + base64data);
+                    //   dataURL = URL.createObjectURL(file);
+                    dataURL = base64data;
+                    infoArray.push(dataURL);
+                    infoArray.push(price);
+                    infoArray.push(itemName_val);
+                    infoArray.push(description);
+
+                    //   console.log('>>>>>>>>  sending this dataURL in image-demo  ' + dataURL);
+                    pubnub.publish({
+                        channel: "shoe-stream",
+                        message: infoArray,
+                        error: function(error) {
+                            console.log('Error is : ' + error)
+                        }
+                    });
+                }
+
+            });
+
+
+
+            $("#addItem_Beer").click(function(event) {
+                event.preventDefault();
+                var price = $("#price_beer").val();
+                var file = $("#file_beer")[0].files[0];
+                var itemName_val = $("#item_beer").val();
+                var description = $('#description_beer').val();
+                checkInputs(price, file, itemName_val);
+
+                // alert(price);
+                // alert(file);
+                // alert(itemName_val);
+                // alert(description);
+
+                var infoArray = [];
+                var reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function() {
+                    var base64data = reader.result;
+                    //  console.log('-------------------   ' + base64data);
+                    //   dataURL = URL.createObjectURL(file);
+                    dataURL = base64data;
+                    infoArray.push(dataURL);
+                    infoArray.push(price);
+                    infoArray.push(itemName_val);
+                    infoArray.push(description);
+
+                    //   console.log('>>>>>>>>  sending this dataURL in image-demo  ' + dataURL);
+                    pubnub.publish({
+                        channel: "beer-stream",
+                        message: infoArray,
+                        error: function(error) {
+                            console.log('Error is : ' + error)
+                        }
+                    });
+                }
+
+            });
+
+
+            $(document).on("click", "#changePrice", function(event) {
+                event.preventDefault();
+                var id = $(this).parent().attr('id');
+                //   alert('changePrice Invoked ' + id);
+                $(this).parent().find('input[type=text]').show();
+                //on focus out, get the new value given in the text field and set to the label
+                var temp_older_Price = $(this).parent().find('label').text();
+                $(this).parent().find('input[type=text]').focusout(function() {
+                    var new_Price = $(this).parent().find('input').val();
+
+                    $(this).parent().find('label').text(new_Price);
+                    var temp_Item_Name = $(this).parent().find('.itemName').text();
+
+                    //    alert("Item " + temp_Item_Name + "   old Price  " + temp_older_Price + " new Price " + new_Price);
+                    $(this).parent().find('input[type=text]').hide();
+
+                    $("#marquee2").html('Price Changed for  ' + temp_Item_Name + " from " + temp_older_Price + " to " + new_Price);
+
+
+                });
+
+            })
+
+
+
+
+        })
+
+        function checkInputs(price, file, itemName) {
+            //  alert('in numeric check ');
+            var numbers = /^[0-9]+$/;
+            if (price.match(numbers)) {} else {
+                alert('Please input numeric characters for price ');
+                return;
+            }
+            if (file == null) {
+                alert('Please upload an image less than 15kB');
+                return false;
+            }
+            if (itemName.length == 0) {
+                alert('name needed pls');
+                return false;
+            }
+
+
+        }
+
+
+        function cart1Checkout() {
+            var saleValue = $('#cart1Total').text();
+
+            if (saleValue < 3000) {
+                alert('Spend > 3000 and get 10% off your purchase value')
+            } else if (saleValue > 3000 && saleValue < 6000) {
+                alert('Pls pickup the gift voucher from the customer center!')
+            }
+        }
+
+        function cart2Checkout() {
+
+            var saleValue2 = $('#cart2Total').text();
+            alert(saleValue2);
+            if (saleValue2 < 5000) {
+                alert('Spend > 6000 and get 10% off your purchase value')
+            } else if (saleValue2 > 16000) {
+                alert('You have won a cruise-trip to Chennai! We will contact you shortly.')
+            }
+        }
+
+        function addToStore1(m) {
+            genId = genId + 1;
+            var storeDiv = document.getElementById("store1");
+            var imgDiv = document.createElement('div');
+            imgDiv.className = "storeImages1 store1";
+            imgDiv.id = genId;
+            var img = document.createElement('img');
+            genId = genId + 1;
+            img.src = m[0]; //dataURL
+            img.title = "Uploaded Image";
+            img.height = 40;
+            img.width = 40;
+            img.id = genId;
+
+            imgDiv.appendChild(img);
+            var para_itemName = document.createElement('p');
+            genId = genId + 1;
+            para_itemName.id = genId;
+            para_itemName.className = "itemName";
+            var node_itemName = document.createTextNode(m[2]); //itemName
+            genId = genId + 1;
+            node_itemName.id = genId;
+            para_itemName.appendChild(node_itemName);
+
+            var para_desc = document.createElement('p');
+            genId = genId + 1;
+            para_desc.id = genId;
+            para_desc.className = "description";
+            var node_description = document.createTextNode(m[3]); //description
+            genId = genId + 1;
+            node_description.id = genId;
+            para_desc.appendChild(node_description);
+
+            genId = genId + 1;
+            var tempLabel = document.createElement('label');
+            tempLabel.className = "label";
+            tempLabel.innerHTML = Math.ceil(m[1] * 1.1); //price
+            tempLabel.setAttribute('id', genId);
+            imgDiv.appendChild(para_itemName);
+            imgDiv.appendChild(para_desc);
+            imgDiv.appendChild(tempLabel);
+            //add the button here   <button type="button" id="editButton" name="Edit">Edit</button>
+            var input = document.createElement("input");
+            input.setAttribute("type", "text");
+            input.setAttribute("style", "display:none");
+            input.setAttribute("name", "editedPrice");
+            //  input.setAttribute("id", "editedPrice");
+            input.setAttribute("value", "100");
+            genId = genId + 1;
+            input.setAttribute("id", genId);
+
+            imgDiv.appendChild(input);
+            var b = document.createElement('button');
+            b.setAttribute("name", "Edit");
+            b.setAttribute("type", "button");
+            b.innerHTML = "Edit";
+            b.id = "changePrice";
+            b.className = "changePrice";
+            //  genId = genId + 1;
+
+
+            imgDiv.appendChild(b);
+            storeDiv.appendChild(imgDiv);
+            //Now make a call to this because we have created dynamic fields, we need to call draggable
+            //  makeDragAndDroppable();
+            $(".storeImages1").draggable({
+                //      grid: [20, 20],
+                //   appendTo: '#cart1',
+                containment: "#container",
+                cursor: 'move',
+                //   revertDuration: 100,
+                revert: 'invalid',
+                helper: 'clone'
+            });
+            $("#marquee1").html('Product Added -' + m[2] + " Buy Now!");
+        }
+
+        function add2Store2(m) {
+            //     alert('add2store2');
+            genId = genId + 1;
+            var storeDiv = document.getElementById("store2");
+            var imgDiv = document.createElement('div');
+            imgDiv.className = "storeImages2 store2";
+            imgDiv.id = genId;
+            var img = document.createElement('img');
+            genId = genId + 1;
+            img.src = m[0]; //dataURL
+            img.title = "Uploaded Image";
+            img.height = 40;
+            img.width = 40;
+            img.id = genId;
+
+            imgDiv.appendChild(img);
+            var para_itemName = document.createElement('p');
+            genId = genId + 1;
+            para_itemName.id = genId;
+            para_itemName.className = "itemName";
+            var node_itemName = document.createTextNode(m[2]); //itemName
+            genId = genId + 1;
+            node_itemName.id = genId;
+            para_itemName.appendChild(node_itemName);
+
+            var para_desc = document.createElement('p');
+            genId = genId + 1;
+            para_desc.id = genId;
+            para_desc.className = "description";
+            var node_description = document.createTextNode(m[3]); //description
+            genId = genId + 1;
+            node_description.id = genId;
+            para_desc.appendChild(node_description);
+
+            genId = genId + 1;
+            var tempLabel = document.createElement('label');
+            tempLabel.className = "label";
+            tempLabel.innerHTML = Math.ceil(m[1] * 1.2); //price
+            tempLabel.setAttribute('id', genId);
+            imgDiv.appendChild(para_itemName);
+            imgDiv.appendChild(para_desc);
+            imgDiv.appendChild(tempLabel);
+            //add the button here   <button type="button" id="editButton" name="Edit">Edit</button>
+            var input = document.createElement("input");
+            input.setAttribute("type", "text");
+            input.setAttribute("style", "display:none");
+            input.setAttribute("name", "editedPrice");
+            //  input.setAttribute("id", "editedPrice");
+            input.setAttribute("value", "100");
+            genId = genId + 1;
+            input.setAttribute("id", genId);
+
+            imgDiv.appendChild(input);
+            var b = document.createElement('button');
+            b.setAttribute("name", "Edit");
+            b.setAttribute("type", "button");
+            b.innerHTML = "Edit";
+            b.id = "changePrice";
+            b.className = "changePrice";
+            //  genId = genId + 1;
+
+
+            imgDiv.appendChild(b);
+            storeDiv.appendChild(imgDiv);
+            //    makeDragAndDroppable();
+            $(".storeImages2").draggable({
+                //      grid: [20, 20],
+                //   appendTo: '#cart1',
+                containment: "#container",
+                cursor: 'move',
+                //   revertDuration: 100,
+                revert: 'invalid',
+                helper: 'clone'
+            });
+        }
+
+
+        function setupPubNub() {
+            pubnub = new PubNub({
+                subscribeKey: 'd2-11ea-adee-16aa024ec639',
+                publishKey: 'ea-bd21-83bc9d68da1c',
+            });
+
+            pubnub.addListener({
+                message: function(m) {
+                    // console.log('message m  is   ' + JSON.stringify(m));
+                    var channelName = m.channel; // The channel for which the message belongs
+                    //   alert('channelName  ' + channelName);
+                    if (m.subscribedChannel == 'banana-stream') {
+                        addToStore1(m.message);
+
+                    } else if (m.subscribedChannel == 'shoe-stream') {
+                        add2Store2(m.message);
+                    } else {
+                        //      alert('adding to both the stores');
+                        addToStore1(m.message);
+                        add2Store2(m.message);
+                    }
+
+
+
+                }
+            });
+
+
+
+            pubnub.subscribe({
+                channels: ['banana-stream', 'shoe-stream', 'beer-stream']
+            });
+
+
+            return pubnub;
+
+        }
+
+        function makeDragAndDroppable() {
+            var priceMultiplier1 = 1.2; //10% of cost
+            var priceMultiplier2 = 1.4; //10% of cost
+
+
+            $("#cart1_droppable").sortable();
+            $("#cart1_droppable").disableSelection();
+
+
+            $("#cart2_droppable").sortable();
+            $("#cart2_droppable").disableSelection();
+
+
+            $(".storeImages1").draggable({
+                //      grid: [20, 20],
+                //   appendTo: '#cart1',
+                containment: "#container",
+                cursor: 'move',
+                //   revertDuration: 100,
+                revert: 'invalid',
+                helper: 'clone'
+            });
+
+
+            $(".storeImages2").draggable({
+                //      grid: [20, 20],
+                //   appendTo: '#cart1',
+                containment: "#container",
+                cursor: 'move',
+                //   revertDuration: 100,
+                revert: 'invalid',
+                helper: 'clone'
+            });
+
+            $('#cart1_droppable').droppable({
+                hoverClass: 'ui-state-highlight',
+                accept: ":not(.ui-sortable-helper, .store2)",
+                drop: function(event, ui) {
+                    $(ui.draggable).clone().appendTo(this);
+                    //      ($this).addClass("ui-state-highlight"); //added to highlight drop
+                    var id = ui.draggable.attr("id");
+                    names_dropped.push(id);
+                    var draggable = ui.draggable;
+                    //   alert(draggable.find("img").attr("title"));
+                    var tempId = (draggable.find("label").attr("id"))
+                    var oldPrice = (draggable.find("label.label").text())
+                    var newPrice = oldPrice //* priceMultiplier1
+                        //     alert(tempId + "   " + oldPrice + "  " + newPrice)
+                    $(this).find('#' + tempId).text(newPrice);
+                    //hide the edit button
+
+                    var input_field_id = draggable.find('input').attr("id");
+
+                    $(this).find('button.changePrice').hide();
+
+                    cart1Total = Math.ceil(parseInt(cart1Total) + parseInt(newPrice));
+                    $('#cart1Total').text(cart1Total);
+                    ui.draggable.draggable("disable");
+
+                }
+            });
+
+            $('#cart2_droppable').droppable({
+                hoverClass: 'ui-state-highlight',
+                accept: ":not(.ui-sortable-helper,.store1)", //don't accept from other store
+                drop: function(event, ui) {
+                    //  alert(ui.draggable.find("p.itemName").text());
+                    //    alert(ui.draggable[0].id);
+                    $(ui.draggable).clone().appendTo(this); {
+                        //     alert('here, will hide the button');
+                        var itemInList = ui.draggable.find("p.itemName").text();
+                        names_dropped.push(itemInList);
+                        //      alert(id);
+                        var draggable = ui.draggable;
+                        //   alert(draggable.find("img").attr("title"));
+                        var tempId = (draggable.find("label").attr("id"))
+                        var oldPrice = (draggable.find("label.label").text())
+                        var newPrice = oldPrice //* priceMultiplier2;
+                            //    alert(tempId + "   " + oldPrice + "  " + newPrice)
+                        $(this).find('#' + tempId).text(newPrice);
+                        var input_field_id = draggable.find('input').attr("id");
+                        $(this).find('button.changePrice').hide();
+                        cart2Total = Math.ceil(parseInt(cart2Total) + parseInt(newPrice));
+                        $('#cart2Total').text(cart2Total);
+
+                        ui.draggable.draggable("disable");
+                    }
+                }
+
+            });
+
+            $('#trash1').droppable({
+                over: function(event, ui) {
+                    alert('about to trash1')
+                    ui.draggable.remove();
+                    var old_cart1_total = $("#cart1Total").text();
+                    // alert(old_cart1_total);
+                    //  alert(ui.draggable.find("label.label").text());
+                    $("#cart1Total").text(old_cart1_total - ui.draggable.find("label.label").text())
+                }
+            });
+
+            $('#trash2').droppable({
+                over: function(event, ui) {
+                    alert('about to trash2')
+                    ui.draggable.remove();
+                    $("#cart2Total").text($("#cart2Total").text() - ui.draggable.find("label.label").text())
+
+                }
+            });
+
+        }
+    </script>
+</head>
+
+
+<body>
+
+    <div class="row container">
+
+        <div class="column" style="background-color:rgb(169, 206, 223);">
+            <h2>Bax Suppliers</h2>
+            <div id="row1">
+                <div class="fieldrows">
+                    <form class="formFields">
+
+                        <div class="fieldrow"><label>Price: </label> <input type="text" id="price" name="price">
+                        </div>
+                        <div class="fieldrow"><input id="file" type="file" class="txtfile" accept="image/*"></div>
+                        <div class="fieldrow"> <label>ItemName: </label> <input type="text" id="item" name="itemName"></div>
+                        <div class="fieldrow"> <label>Description: </label> <input type="text" id="description" name="description"></div>
+
+                        <div class="fieldrow"><button type="button" id="addItem_Banana" class="button button1">Add
+                                    Banana</button></div>
+                    </form>
+                </div>
+            </div>
+            <div id="row2">
+                <h2>Shez Suppliers</h2>
+
+                <div class="fieldrows">
+                    <form class="formFields">
+
+
+                        <div class="fieldrow"><label>Price: </label><input type="text" id="price_shoes" name="price"></div>
+                        <div class="fieldrow"><input id="file_shoes" type="file" class="txtfile" accept="image/*">
+                        </div>
+                        <div class="fieldrow"> <label>ItemName: </label><input type="text" id="item_shoes" name="itemName"></div>
+                        <div class="fieldrow"> <label>Description: </label><input type="text" id="description_shoes" name="description"></div>
+
+                        <div class="fieldrow"><button type="button" id="addItem_Shoes" class="button button1">Add
+                                    Shoe</button></div>
+                    </form>
+
+                </div>
+            </div>
+            <div id="row3">
+                <h2>Beera Suppliers</h2>
+                <div class="fieldrows">
+
+                    <form class="formFields">
+
+                        <div class="fieldrow"><label>Price: </label> <input type="text" id="price_beer" name="price"></div>
+                        <div class="fieldrow"><input id="file_beer" type="file" class="txtfile" accept="image/*">
+                        </div>
+                        <div class="fieldrow"><label>ItemName: </label> <input type="text" id="item_beer" name="itemName"></div>
+                        <div class="fieldrow"><label>Description: </label><input type="text" id="description_beer" name="description"></div>
+
+
+                        <div class="fieldrow"><button type="button" id="addItem_Beer" class="button button1">Add
+                                    Beer</button></div>
+                    </form>
+                </div>
+
+            </div>
+
+
+        </div>
+        <div class="column" style="background-color:rgb(240, 225, 161);">
+
+
+            <div class="storecart">
+                <h3>What I wish to buy in my salary</h3>
+                <div id="store1">
+
+
+
+                </div>
+            </div>
+
+            <div class="storecart">
+                <h3>What my boss buys with his/her salary</h3>
+                <div id="store2">
+
+
+                </div>
+
+            </div>
+        </div>
+        <div class="column" style="background-color:rgb(190, 232, 240);">
+            <h3>My Cart - Everyday Newer Products</h3>
+
+            <div id="cart1_droppable">
+                <marquee behavior="scroll" direction="left" id="marquee1">New Products ... </marquee>
+                <!-- <div id="rotatingText" class="marquee">
+            <span id="rotatingTextSpan"></span>
+        </div> -->
+                <b>
+                        <div id="cart1Total"></div>
+                    </b>
+                <button id="cart1Checkout" onclick="cart1Checkout()" class="button button4">Checkout! </button>
+
+
+
+            </div>
+            <div class="trashcontainer">
+                <div id="trash1" class="trashicon">Trash</div>
+            </div>
+            <h3 class="mttop">Boss Cart - Everyday Lower Prices</h3>
+
+            <div id="cart2_droppable">
+                <marquee behavior="scroll" direction="left" id="marquee2">Price Changes... </marquee>
+                <b>
+                        <div id="cart2Total"></div>
+                    </b>
+
+                <button id="cart2Checkout" onclick="cart2Checkout()" class="button button_high button4">Checkout!
+                    </button>
+
+            </div>
+            <div class="trashcontainer">
+                <div id="trash2" class="trashicon">Trash</div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+
+
+</body>
+
+</html>

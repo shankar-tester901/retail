@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "targets": [
+      "retail_flow_function"
+    ],
+    "ignore": [],
+    "source": "functions"
+  },
+  "client": {
+    "source": "client"
+  }
+}
